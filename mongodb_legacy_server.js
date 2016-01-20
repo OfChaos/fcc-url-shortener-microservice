@@ -1,5 +1,5 @@
 // Due to Heroku only allowing MongoDB aaS - which requires CC information, to charge in case you go over the bandwidth, I have opted to not use MongoDB.
-// Hence this "legacy" file is for when you'd like to use MongoDB.
+// Hence this "legacy" file is for when you'd like to use MongoDB and get the extra security/performance.
 //
 // So why not simply fill in CC information? aaS has burned me before when a spambot got at my program, I owed 1500 dollar at the end of the month.
 // So no thank you, to that.
