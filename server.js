@@ -28,7 +28,7 @@ var server = http.createServer(function(req, res) {
   else if(/^\/[0-9]+$/.test(path)) {
     getShorts({ "short_url": "https://herokulink/"+path.substr(1) }, function(json) {
       if(json === undefined) {
-        res.end("Does not exist");
+        res.end("The requested shortlink does not exist");
       } 
       else res.end(json);
     });
