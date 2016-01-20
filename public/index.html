@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>URL Shortener Microservice</title>
+    <style>
+        body {
+            font-weight: 800;
+        }
+    
+        .container {
+            width: 60%;
+            margin: auto;
+            padding-top: 20px;
+        }
+        
+        .title {
+            font-size: 2.7em;
+            text-align: center;
+            color: black;
+        }
+        
+        h3 {
+            color: blue;
+        }
+        
+        code {
+            color: #C2254A;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">
+            API: URL Shortener Microservice
+        </h1>
+        
+        <h3>Example creation usage:</h3>
+        <code>https://Herokulink/https://google.com</code><br>
+        <code>https://Herokulink/http://www.google.com</code>
+        
+        <h3>Example creation output:</h3>
+        <code>
+            {"original_url":"https://ofchaos.com","short_url":"1"}
+        </code>
+        
+        <h3>Usage:</h3>
+        <code>https://shurli.herokuapp.com/4</code>
+        <h3>Will redirect to:</h3>
+        <code>http://freecodecamp.com/news</code>
+    </div>
+</body>
