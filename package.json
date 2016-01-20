@@ -6,7 +6,7 @@
   "dependencies": {
     "monk": "^1.0.1",
     "async": "^0.2.10",
-    "mongodb": "^2.1.4",
+    "mongodb": "^1.4.4",
     "socket.io": "^0.9.17",
     "express": "^3.2.6"
   },

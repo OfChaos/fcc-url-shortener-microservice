@@ -1,3 +1,4 @@
+// Using MongoDB 1.4.4 due to dependency errors with Mongoskin through Monk when using Heroku
 var http = require('http');
 var URL = require('url');
 var monk = require('monk');
