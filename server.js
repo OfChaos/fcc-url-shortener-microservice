@@ -1,10 +1,13 @@
-// Using MongoDB 1.4.4 due to dependency errors with Mongoskin through Monk when using Heroku
+// Due to Heroku only allowing MongoDB aaS - which requires CC information, to charge in case you go over the bandwidth, I have opted to not use MongoDB.
+// The same file but with MongoDB integration is now in "mongodb_legacy_server.js".
+//
+// So why not simply fill in CC information? aaS has burned me before when a spambot got at my program, I owed 1500 dollar at the end of the month.
+// So no thank you, to that.
+
 var http = require('http');
 var URL = require('url');
-var monk = require('monk');
-var db = monk('localhost:27017/shortlinks');
-var collection = db.get("shorts");
 var fs = require("fs");
+var db = JSON.parse(fs.readFileSync("db.json", "utf-8"));
 
 var server = http.createServer(function(req, res) {
   var path = URL.parse(req.url).pathname.toLowerCase();
@@ -45,45 +48,66 @@ function isValidUrl(path) {
 }
 
 function isInDB(path, callback) {
-  collection.find({ "original_url": path }, function(err, documents) {
-    if(err) throw err;
-    
-    var inDB = false;
-    
-    if(documents.length > 0) inDB = true;
-    else inDB = false;
-    
-    callback(inDB);
-  });
+  var inDB = false;
+  var original = db["original_url"];
+  
+  for(var i = 0, len = original.length; i < len; i++) {
+    if(original[i][path] !== undefined) {
+      inDB = true;
+      break;
+    }
+  }
+  
+  callback(inDB);
 }
 
 function getShorts(searchObj, callback) {
-  collection.find(searchObj, { _id: false, "original_url": true, "short_url": true }, function(err, documents) {
-    if(err) throw err;
+  var json;
+  var searchArr;
+  var toSearch;
+  
+  if(searchObj["original_url"] !== undefined) {
     
-    if(documents.length > 0) delete documents[0]["_id"]; // Since I, for some inexplicable reason, cannot remove the _id by using projection
-    var json = JSON.stringify(documents[0]);
-      
-    callback(json);
-  });
+    searchArr = db["original_url"];
+    toSearch = searchObj["original_url"];
+    
+  } else if(searchObj["short_url"] !== undefined) {
+    
+    searchArr = db["short_url"];
+    toSearch = searchObj["short_url"];
+    
+  }
+  
+  for(var i = 0, len = searchArr.length; i < len; i++) {
+    if(searchArr[i][toSearch] !== undefined) {
+      json = searchArr[i][toSearch];
+      break;
+    }
+  }
+  
+  callback(json);
 }
 
 function insertIntoDB(path, callback) {
-  collection.count({}, function(err, docs) {
-    if(err) throw err;
-    
-    var num = docs+1;
+  var num = db["original_url"].length + 1;
+  var short = "https://evening-everglades-43718.herokuapp.com/"+num;
   
-    var json = { "original_url": path,
-                 "short_url": "https://evening-everglades-43718.herokuapp.com/"+num };
-    
-    collection.insert(json, function(err, data) {
-      if(err) throw err;
-      
-      delete json["_id"];
-      callback(JSON.stringify(json));
-    });
-  });
+  var original_json = {};
+  original_json[path] = short;
+  
+  var short_json = {};
+  short_json[short] = path;
+  
+  db["original_url"].push(original_json);
+  db["short_url"].push(short_json);
+  
+  try {
+    fs.writeFileSync("db.json", JSON.stringify(db), "utf-8");
+  } catch(err) {
+    throw err;
+  }
+  
+  callback(JSON.stringify(original_json));
 }
   
 server.listen(process.env.PORT || 8080);
