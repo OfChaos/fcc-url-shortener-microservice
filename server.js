@@ -1,6 +1,5 @@
 var http = require('http');
 var URL = require('url');
-var mongo = require("mongodb").MongoClient;
 var monk = require('monk');
 var db = monk('localhost:27017/shortlinks');
 var collection = db.get("shorts");
@@ -13,7 +12,7 @@ var server = http.createServer(function(req, res) {
     if(newPath === "" ||  !isValidUrl(newPath)) res.end("Please Enter a valid url.");
     
     isInDB(newPath, function(inDB) {
-      if(inDB) {
+      if(inDB) { // If it already exists, spew out the existing one, don't waste resources creating a new entry
         
         getShorts({ "original_url": newPath }, function(json) {
           res.end(json);
@@ -27,7 +26,10 @@ var server = http.createServer(function(req, res) {
   }
   else if(/^\/[0-9]+$/.test(path)) {
     getShorts({ "short_url": path.substr(1) }, function(json) {
-      res.end(json);
+      if(json === undefined) {
+        // TODO - SHOW front page
+      } 
+      else res.end(json);
     });
   } else {
     // TODO - SHOW front page
@@ -54,10 +56,10 @@ function isInDB(path, callback) {
 function getShorts(searchObj, callback) {
   collection.find(searchObj, { _id: false, "original_url": true, "short_url": true }, function(err, documents) {
     if(err) throw err;
-
-    delete documents[0]["_id"]; // Since I, for some inexplicable reason, cannot remove the _id by using projection
-    var json = JSON.stringify(documents[0]);
     
+    if(documents.length > 0) delete documents[0]["_id"]; // Since I, for some inexplicable reason, cannot remove the _id by using projection
+    var json = JSON.stringify(documents[0]);
+      
     callback(json);
   });
 }
