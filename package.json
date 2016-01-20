@@ -5,7 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "mongodb": "^1.4.4",
-    "monk": "^1.0.2"
+    "monk": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {
