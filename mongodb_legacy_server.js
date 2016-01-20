@@ -37,7 +37,12 @@ var server = http.createServer(function(req, res) {
       if(json === undefined) {
         res.end("The requested shortlink does not exist");
       } 
-      else res.end(json);
+      else {
+        //res.end(json);
+        res.writeHead(301, {Location: json});
+        res.end();
+        
+      }
     });
   } else {
     var r = fs.readFileSync("./public/index.html");
