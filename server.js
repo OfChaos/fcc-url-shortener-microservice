@@ -27,7 +27,7 @@ var server = http.createServer(function(req, res) {
     });
   }
   else if(/^\/[0-9]+$/.test(path)) {
-    getShorts({ "short_url": "https://herokulink/"+path.substr(1) }, function(json) {
+    getShorts({ "short_url": "https://evening-everglades-43718.herokuapp.com/"+path.substr(1) }, function(json) {
       if(json === undefined) {
         res.end("The requested shortlink does not exist");
       } 
@@ -75,7 +75,7 @@ function insertIntoDB(path, callback) {
     var num = docs+1;
   
     var json = { "original_url": path,
-                 "short_url": "https://herokulink/"+num };
+                 "short_url": "https://evening-everglades-43718.herokuapp.com/"+num };
     
     collection.insert(json, function(err, data) {
       if(err) throw err;
@@ -85,6 +85,5 @@ function insertIntoDB(path, callback) {
     });
   });
 }
-
   
 server.listen(process.env.PORT || 8080);
