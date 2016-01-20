@@ -3,21 +3,22 @@ var URL = require('url');
 var monk = require('monk');
 var db = monk('localhost:27017/shortlinks');
 var collection = db.get("shorts");
+var fs = require("fs");
 
 var server = http.createServer(function(req, res) {
   var path = URL.parse(req.url).pathname.toLowerCase();
   
   if(path.substr(0, 5) === "/new/") {
     var newPath = path.substr(5);
-    if(newPath === "" ||  !isValidUrl(newPath)) res.end("Please Enter a valid url.");
-    
+    if(newPath === "" ||  !isValidUrl(newPath)) return res.end("Please Enter a valid url.");
+      
     isInDB(newPath, function(inDB) {
       if(inDB) { // If it already exists, spew out the existing one, don't waste resources creating a new entry
-        
+          
         getShorts({ "original_url": newPath }, function(json) {
           res.end(json);
         });
-        
+          
       }
       else insertIntoDB(newPath, function(json) {
         res.end(json);
@@ -25,14 +26,16 @@ var server = http.createServer(function(req, res) {
     });
   }
   else if(/^\/[0-9]+$/.test(path)) {
-    getShorts({ "short_url": path.substr(1) }, function(json) {
+    getShorts({ "short_url": "https://herokulink/"+path.substr(1) }, function(json) {
       if(json === undefined) {
-        // TODO - SHOW front page
+        res.end("Does not exist");
       } 
       else res.end(json);
     });
   } else {
-    // TODO - SHOW front page
+    var r = fs.readFileSync("./public/index.html");
+		res.writeHead(200, "Content-Type", "text/html");
+		res.end(r);
   }
 });
 
@@ -71,7 +74,7 @@ function insertIntoDB(path, callback) {
     var num = docs+1;
   
     var json = { "original_url": path,
-                 "short_url": num.toString() }; // We set it to string so we don't have to create 2 functions to get the json by short and by original
+                 "short_url": "https://herokulink/"+num };
     
     collection.insert(json, function(err, data) {
       if(err) throw err;
